@@ -170,7 +170,7 @@ class UmichContactDataset(contact_dataset):
 
         balanced_acc_of_legs = [(tpr + tnr)/2 for tpr, tnr in zip(TPR, TNR)]
         recall_of_legs = [rates[f'{k}/TP']/(rates[f'{k}/TP'] + rates[f'{k}/FP']) for k in self.leg_names]
-        f1score_of_legs = self.calculate_f1_score_of_legs(y_pred, y_gt)
+        f1score_of_legs = [2*(p * r)/(r + p) for p, r in zip(precision_of_legs, recall_of_legs)]
         pred_pos_cond_rate_of_legs = [(rates[f'{k}/TP'] + rates[f'{k}/FP']) /
                                        (rates[f'{k}/TP'] + rates[f'{k}/FP'] + rates[f'{k}/TN'] + rates[f'{k}/FN']) for k in self.leg_names]
 
