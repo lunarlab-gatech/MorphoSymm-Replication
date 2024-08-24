@@ -18,7 +18,7 @@ conda activate rss2023
 Run the following command:
 ```
 git submodule init
-git submodule update --force --recursive --remote
+git submodule update
 ```
 
 Change lines 16 and 17 in "deep_contact_estimator/src/test.py" to the following:
