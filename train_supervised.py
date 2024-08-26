@@ -56,27 +56,68 @@ def get_model(cfg, Gin=None, Gout=None, cache_dir=None):
         raise NotImplementedError(cfg.model_type)
     return model
 
+def create_train_val_datasets(cfg, device):
+    """
+    This method creates the train and validation sets.
+    """
+
+    # Create the train and validation datasets
+    air_walking_gait = UmichContactDataset(data_name="air_walking_gait.npy", label_name="air_walking_gait_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    grass = UmichContactDataset(data_name="grass.npy", label_name="grass_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    middle_pebble = UmichContactDataset(data_name="middle_pebble.npy", label_name="middle_pebble_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    concrete_left_circle = UmichContactDataset(data_name="concrete_left_circle.npy", label_name="concrete_left_circle_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    concrete_difficult_slippery = UmichContactDataset(data_name="concrete_difficult_slippery.npy", label_name="concrete_difficult_slippery_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    asphalt_road = UmichContactDataset(data_name="asphalt_road.npy", label_name="asphalt_road_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    old_asphalt_road = UmichContactDataset(data_name="old_asphalt_road.npy", label_name="old_asphalt_road_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    concrete_galloping = UmichContactDataset(data_name="concrete_galloping.npy", label_name="concrete_galloping_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    rock_road = UmichContactDataset(data_name="rock_road.npy", label_name="rock_road_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    sidewalk = UmichContactDataset(data_name="sidewalk.npy", label_name="sidewalk_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    train_val_datasets = [air_walking_gait, grass, middle_pebble, concrete_left_circle, concrete_difficult_slippery, asphalt_road, old_asphalt_road, concrete_galloping,
+                          rock_road, sidewalk]
+
+    train_subsets = []
+    val_subsets = []
+    for dataset in train_val_datasets:
+        split_index = int(np.round(dataset.__len__() * 0.85)) # When value has .5, round to nearest-even
+        train_subsets.append(torch.utils.data.Subset(dataset, np.arange(0, split_index)))
+        val_subsets.append(torch.utils.data.Subset(dataset, np.arange(split_index, dataset.__len__())))
+    train_dataset = torch.utils.data.ConcatDataset(train_subsets)
+    val_dataset = torch.utils.data.ConcatDataset(val_subsets) 
+    return train_dataset, val_dataset
+
+def create_test_dataset(cfg, device):
+    """
+    This method creates the test dataset.
+    """
+
+    concrete_pronking = UmichContactDataset(data_name="concrete_pronking.npy", label_name="concrete_pronking_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    concrete_right_circle = UmichContactDataset(data_name="concrete_right_circle.npy", label_name="concrete_right_circle_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    small_pebble = UmichContactDataset(data_name="small_pebble.npy", label_name="small_pebble_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    air_jumping_gait = UmichContactDataset(data_name="air_jumping_gait.npy", label_name="air_jumping_gait_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    forest = UmichContactDataset(data_name="forest.npy", label_name="forest_label.npy", train_ratio=cfg.dataset.train_ratio, augment=cfg.dataset.augment,
+                        use_class_imbalance_w=False, window_size=cfg.dataset.window_size, device=device, partition=cfg.dataset.data_folder)
+    test_dataset = torch.utils.data.ConcatDataset([concrete_pronking, concrete_right_circle, small_pebble, air_jumping_gait, forest])
+    return test_dataset
 
 def get_datasets(cfg, device, root_path):
     if cfg.dataset.name == "contact":
-        train_dataset = UmichContactDataset(data_name="train.npy",
-                                            label_name="train_label.npy", train_ratio=cfg.dataset.train_ratio,
-                                            augment=cfg.dataset.augment,
-                                            use_class_imbalance_w=False,
-                                            window_size=cfg.dataset.window_size, device=device,
-                                            partition=cfg.dataset.data_folder)
+        train_dataset, val_dataset = create_train_val_datasets(cfg, device)
+        test_dataset = create_test_dataset(cfg, device)
 
-        val_dataset = UmichContactDataset(data_name="val.npy",
-                                          label_name="val_label.npy", train_ratio=cfg.dataset.train_ratio,
-                                          augment=False, use_class_imbalance_w=False,
-                                          window_size=cfg.dataset.window_size, device=device,
-                                          partition=cfg.dataset.data_folder)
-        test_dataset = UmichContactDataset(data_name="test.npy",
-                                           label_name="test_label.npy", train_ratio=cfg.dataset.train_ratio,
-                                           augment=False, use_class_imbalance_w=False,
-                                           window_size=cfg.dataset.window_size, device=device,
-                                           partition=cfg.dataset.data_folder,
-                                           )
         sampler = None
         if cfg.dataset.balanced_classes:
             class_freqs = torch.clone(train_dataset.contact_state_freq)
@@ -88,13 +129,14 @@ def get_datasets(cfg, device, root_path):
             # a = sample_weights.cpu().numpy()
             sampler = WeightedRandomSampler(sample_weights, num_samples=cfg.dataset.batch_size, replacement=False)
 
+        collate_fn = lambda x: train_dataset.datasets[0].dataset.collate_fn(x)
         train_dataloader = DataLoader(dataset=train_dataset, batch_size=cfg.dataset.batch_size,
                                       shuffle=True if sampler is None else None, sampler=sampler,
-                                      num_workers=cfg.num_workers, collate_fn=lambda x: train_dataset.collate_fn(x))
+                                      num_workers=cfg.num_workers, collate_fn=collate_fn)
         val_dataloader = DataLoader(dataset=val_dataset, batch_size=cfg.dataset.batch_size,
-                                    collate_fn=lambda x: val_dataset.collate_fn(x), num_workers=cfg.num_workers)
+                                    collate_fn=collate_fn, num_workers=cfg.num_workers)
         test_dataloader = DataLoader(dataset=test_dataset, batch_size=cfg.dataset.batch_size,
-                                     collate_fn=lambda x: val_dataset.collate_fn(x), num_workers=cfg.num_workers)
+                                     collate_fn=collate_fn, num_workers=cfg.num_workers)
 
     elif cfg.dataset.name == "com_momentum":
         robot, Gin_data, Gout_data, Gin_model, Gout_model, = get_robot_params(cfg.robot_name)
@@ -246,15 +288,21 @@ def main(cfg: DictConfig):
         train_dataloader, val_dataloader, test_dataloader = dataloaders
 
         # Prepare model
-        model = get_model(cfg.model, Gin=train_dataset.Gin, Gout=train_dataset.Gout, cache_dir=cache_dir)
+        first_dataset = train_dataset.datasets[0].dataset
+        model = get_model(cfg.model, Gin=first_dataset.Gin, Gout=first_dataset.Gout, cache_dir=cache_dir)
         log.info(model)
 
         # Prepare Lightning
-        test_set_metrics_fn = (lambda x: test_dataset.test_metrics(*x)) if hasattr(test_dataset,
+        test_set_metrics_fn = (lambda x: first_dataset.test_metrics(*x)) if hasattr(first_dataset,
                                                                                    'test_metrics') else None
-        val_set_metrics_fn = (lambda x: val_dataset.test_metrics(*x)) if hasattr(val_dataset, 'test_metrics') else None
-        pl_model = LightningModel(lr=cfg.model.lr, loss_fn=train_dataset.loss_fn,
-                                  metrics_fn=lambda x, y: train_dataset.compute_metrics(x, y),
+        val_set_metrics_fn = (lambda x: first_dataset.test_metrics(*x)) if hasattr(first_dataset, 'test_metrics') else None
+
+        # Make sure we properly get the test function
+        assert test_set_metrics_fn is not None
+        assert val_set_metrics_fn is not None
+
+        pl_model = LightningModel(lr=cfg.model.lr, loss_fn=first_dataset.loss_fn,
+                                  metrics_fn=lambda x, y: first_dataset.compute_metrics(x, y),
                                   test_epoch_metrics_fn=test_set_metrics_fn,
                                   val_epoch_metrics_fn=val_set_metrics_fn,
                                   )

@@ -56,7 +56,7 @@ class UmichContactDataset(contact_dataset):
 
         self.num_data = (data.shape[0]-window_size+1)
         self.window_size = window_size
-        self.data = torch.from_numpy(data).type('torch.FloatTensor').to(device)
+        self.data = torch.from_numpy(data).type('torch.DoubleTensor').to(device)
         self.label = torch.from_numpy(label).type('torch.LongTensor').to(device)
         # ----
         self.device = device
@@ -71,7 +71,6 @@ class UmichContactDataset(contact_dataset):
             # self._hout = coo2torch_coo(self.Gout.discrete_generators[0])
         self.hin = torch.tensor(self.Gin.discrete_generators[0].todense(), device=device)
         self.hout = torch.tensor(self.Gout.discrete_generators[0].todense(), device=device)
-
         if use_class_imbalance_w:
             self.class_weights = 1 - self.contact_state_freq if loss_class_weights is None else loss_class_weights
         else:
@@ -388,25 +387,19 @@ class UmichContactDataset(contact_dataset):
         save_path.mkdir(exist_ok=True)
 
         print(f"\nCreating dataset partition: train:{train_ratio}, val:{val_ratio} from {data_path}")
-        (train_data, val_data), (train_label, val_label) = UmichContactDataset.load_and_split_mat_files(data_path=train_val_data_path,
-                                                                                                        partitions_ratio=(train_ratio, val_ratio),
-                                                                                                        partitions_name=("train", "test"))
+        UmichContactDataset.load_and_split_mat_files(data_path=train_val_data_path,
+                                                    save_path=save_path,
+                                                    partitions_ratio=(train_ratio, val_ratio),
+                                                    partitions_name=("train", "test"))
         print(f"\nCreating dataset test from {test_data_path}")
-        (test_data,), (test_label,) = UmichContactDataset.load_and_split_mat_files(data_path=test_data_path,
-                                                                                   partitions_ratio=(1.0,),
-                                                                                   partitions_name=("test",))
+        UmichContactDataset.load_and_split_mat_files(data_path=test_data_path,
+                                                    save_path=save_path,
+                                                    partitions_ratio=(1.0,),
+                                                    partitions_name=("test",))
 
-        print(f"Saving data to {save_path.resolve()}")
-
-        np.save(str(save_path.joinpath("train.npy")), train_data)
-        np.save(str(save_path.joinpath("val.npy")), val_data)
-        np.save(str(save_path.joinpath("test.npy")), test_data)
-        np.save(str(save_path.joinpath("train_label.npy")), train_label)
-        np.save(str(save_path.joinpath("val_label.npy")), val_label)
-        np.save(str(save_path.joinpath("test_label.npy")), test_label)
 
     @staticmethod
-    def load_and_split_mat_files(data_path: pathlib.Path, partitions_ratio=(0.85, 0.15),
+    def load_and_split_mat_files(data_path: pathlib.Path, save_path: pathlib.Path, partitions_ratio=(0.85, 0.15),
                                  partitions_name=("train", "val")):
         partitions_data = [None] * len(partitions_ratio)
         partitions_labels = [None] * len(partitions_ratio)
@@ -431,33 +424,39 @@ class UmichContactDataset(contact_dataset):
             omega = raw_data['imu_omega']
 
             # concatenate current data. First we try without GRF
-            cur_data = np.concatenate((q, qd, acc, omega, p, v), axis=1)
+            cur_data = np.concatenate((q, qd, acc, omega, p, v), axis=1, dtype=np.double)
             # convert labels from binary to decimal
             def binary2decimal(a, axis=-1):
                 return np.right_shift(np.packbits(a, axis=axis), 8 - a.shape[axis]).squeeze()
             cur_label = binary2decimal(contacts).reshape((-1, 1))
+            
+            # Save the reformatted data (without partitioning)
+            dataset_name = data_name.split("/")[-1][:-4] 
+            np.save(str(save_path.joinpath(dataset_name + ".npy")), cur_data)
+            np.save(str(save_path.joinpath(dataset_name + "_label.npy")), cur_label.flatten())
 
             # separate data into given paritions
-            num_data = np.shape(q)[0]
-            all_samples += num_data
-            partitions_size = [int(ratio * num_data) for ratio in partitions_ratio]
+            # num_data = np.shape(q)[0]
+            # all_samples += num_data
+            # partitions_size = [int(ratio * num_data) for ratio in partitions_ratio]
 
-            lower_lim = 0
-            for partition_id, (partition_size, partition_name) in enumerate(zip(partitions_size, partitions_name)):
-                if partitions_data[partition_id] is None:
-                    partitions_data[partition_id] = []
-                    partitions_labels[partition_id] = []
-                partitions_data[partition_id].append(cur_data[lower_lim:lower_lim + partition_size, :])
-                partitions_labels[partition_id].append(cur_label[lower_lim:lower_lim + partition_size, :])
-                lower_lim += partition_size
+            # lower_lim = 0
+            # for partition_id, (partition_size, partition_name) in enumerate(zip(partitions_size, partitions_name)):
+            #     if partitions_data[partition_id] is None:
+            #         partitions_data[partition_id] = []
+            #         partitions_labels[partition_id] = []
+            #     partitions_data[partition_id].append(cur_data[lower_lim:lower_lim + partition_size, :])
+            #     partitions_labels[partition_id].append(cur_label[lower_lim:lower_lim + partition_size, :])
+            #     lower_lim += partition_size
 
-        partitions_data = [np.vstack(data_list) for data_list in partitions_data]
-        partitions_labels = [np.vstack(label_list).reshape(-1, ) for label_list in partitions_labels]
+        # partitions_data = [np.vstack(data_list) for data_list in partitions_data]
+        # partitions_labels = [np.vstack(label_list).reshape(-1, ) for label_list in partitions_labels]
 
-        for name, ratio, data in zip(partitions_name, partitions_ratio, partitions_data):
-            # assert ratio * all_samples == data.shape[0]
-            print(f"\t - {name} ({ratio*100:.1f}%) = {data.shape[0]:d} samples --> {data.shape[0]/all_samples*100:.1f}%")
-        return partitions_data, partitions_labels
+        # for name, ratio, data in zip(partitions_name, partitions_ratio, partitions_data):
+        #     # assert ratio * all_samples == data.shape[0]
+        #     print(f"\t - {name} ({ratio*100:.1f}%) = {data.shape[0]:d} samples --> {data.shape[0]/all_samples*100:.1f}%")
+
+        # return partitions_data, partitions_labels
 
     def compute_confusion_mat(self, bin_contact_pred_arr, bin_contact_gt_arr, pred_state, gt_state):
 
