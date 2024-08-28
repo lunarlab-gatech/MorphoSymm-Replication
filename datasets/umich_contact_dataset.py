@@ -56,7 +56,7 @@ class UmichContactDataset(contact_dataset):
 
         self.num_data = (data.shape[0]-window_size+1)
         self.window_size = window_size
-        self.data = torch.from_numpy(data).type('torch.DoubleTensor').to(device)
+        self.data = torch.from_numpy(data).type('torch.FloatTensor').to(device)
         self.label = torch.from_numpy(label).type('torch.LongTensor').to(device)
         # ----
         self.device = device

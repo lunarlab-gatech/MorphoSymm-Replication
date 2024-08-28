@@ -213,8 +213,8 @@ class TestUmichContactDataset(unittest.TestCase):
 
         # Assert they are correct
         np.testing.assert_equal(des_len, forest.__len__())
-        np.testing.assert_array_equal(first_entry, forest.data[149])
-        np.testing.assert_array_equal(first_entry_labels, forest.label[149])
+        np.testing.assert_array_almost_equal(first_entry, forest.data[149], 16)
+        np.testing.assert_array_almost_equal(first_entry_labels, forest.label[149], 16)
 
     def test_create_test_dataset(self):
         """
@@ -544,8 +544,8 @@ class TestUmichContactDataset(unittest.TestCase):
                   dtype=torch.float64)
 
         # Make sure the correct entries match
-        np.testing.assert_array_almost_equal(test_dataset.__getitem__(304666)['data'][:,0:12], des_values_air_jumping_gait_side, 13)
-        np.testing.assert_array_almost_equal(test_dataset.__getitem__(304667)['data'][:,0:12], des_values_forest_side, 13)
+        np.testing.assert_array_almost_equal(test_dataset.__getitem__(304666)['data'][:,0:12], des_values_air_jumping_gait_side, 5)
+        np.testing.assert_array_almost_equal(test_dataset.__getitem__(304667)['data'][:,0:12], des_values_forest_side, 4)
 
         # Make sure this dataset has the correct number of entries
         np.testing.assert_equal(test_dataset.__len__(), 376662)
@@ -744,7 +744,7 @@ class TestUmichContactDataset(unittest.TestCase):
 				  [-1.5728004061427669, -3.7082601245299807, 3.8455322956899223, 0.4393580792682247, 1.1812594640722327, -1.3681103928410034, -0.6181990900179514, 1.1750830839050943, -1.3354658722521413, 0.9435698272239712, -3.2546257534258980, 3.8632376247128279],
 				  [-1.5728004061427669, -3.7082601245299807, 3.8455322956899223, 0.4393580792682247, 1.1812594640722327, -1.3681103928410034, -0.6181990900179514, 1.1750830839050943, -1.3354658722521413, 0.9435698272239712, -3.2546257534258980, 3.8632376247128279]],
                   dtype=torch.float64)
-        np.testing.assert_array_almost_equal(train_dataset.__getitem__(125358)['data'][:,0:12], des_train, 13)
+        np.testing.assert_array_almost_equal(train_dataset.__getitem__(125358)['data'][:,0:12], des_train, 5)
 
         # Test the val dataset
         des_val = torch.tensor([[-1.4988686204302244, 1.4900277912148840, -0.9558257901557550, -1.9142587663589925, -2.3610755112891928, 1.9773051462918161, -0.3879148904948824, -2.5040080476038877, 1.9780257911438417, 0.3255999980177398, 1.5297297075982812, -0.9709257785436712],
@@ -898,7 +898,7 @@ class TestUmichContactDataset(unittest.TestCase):
 				  [1.5999144993444732, 0.7915610022249484, 0.6631896201446699, 1.0934648859597853, -0.3922313962204910, -0.8422337972052253, -2.2534189197032855, -0.2385483663836282, -0.8384606841376300, 2.6493640709391926, 0.8696656786106824, 0.6130353812512614],
 				  [1.6368042256256261, 0.9229611366205823, 0.5843471169063936, 1.0934648859597853, -0.3983079818135180, -0.8606420482482395, -2.3615640808168159, -0.2545697216016778, -0.8581644142442819, 2.7777470531036079, 1.0111048134130518, 0.5209325337472112]],
                   dtype=torch.float64)
-        np.testing.assert_array_almost_equal(val_dataset.__getitem__(6636)['data'][:,0:12], des_val, 13)
+        np.testing.assert_array_almost_equal(val_dataset.__getitem__(6636)['data'][:,0:12], des_val, 5)
         
 
 if __name__ == "__main__":
