@@ -294,8 +294,6 @@ if __name__ == "__main__":
     for leg_name in ["LF", "LH", "RF", "RH", "legs_avg"]:
         state_metrics = [c for c in df.columns if f"test_{leg_name}/f1" in c] #+ ['test_contact_state/acc', 'Model Type', 'Hyper params']
         state_metrics += [c for c in df.columns if f"test_{leg_name}/acc" in c] + ['test_contact_state/acc', 'Model Type', 'Hyper params']
-        if leg_name == "legs_avg":
-            state_metrics.remove('test_legs_avg/f1')
         state_metrics_names = [c.split("/")[-1] for c in state_metrics]
         df_state = df[state_metrics].copy()
         df_state.columns = df_state.columns.str.replace(f'test_{leg_name}/', f'Leg-{leg_name}\n')
