@@ -53,7 +53,9 @@ The models are too large to store on GitHub. Therefore, you can download the mod
 
 ## Viewing Results
 
-The figures from our pretrained models can be found in the `experiments/contact_sample_eff_splitted_mini-cheetah/results_filter_['train_ratio=0.85']ignore_['scale=0.25', 'scale=0.5', 'scale=1.0', 'scale=1.5', 'scale=2.0', 'scale=2.5']` directory.
+The figures from our pretrained models can be found in the `experiments/contact_sample_eff_splitted_mini-cheetah/results_filter_['train_ratio=0.85']ignore_['scale=0.25', 'scale=0.5', 'scale=1.0', 'scale=1.5', 'scale=2.0', 'scale=2.5']` directory. Here is a figure equivalent to Figure 4-Right in the original paper:
+
+![Figure 4-Right Replicated](https://github.com/lunarlab-gatech/MorphoSymm-Replication/blob/rss2023-OriginalFunctionality/experiments/contact_sample_eff_splitted_mini-cheetah/results_filter_%5B'train_ratio=0.85'%5Dignore_%5B'scale=0.25',%20'scale=0.5',%20'scale=1.0',%20'scale=1.5',%20'scale=2.0',%20'scale=2.5'%5D/legs_contact_state_metrics.png?raw=true)
 
 However, if you want to generate the figures using your trained models, or regenerate the figures, use the comands below:
 
