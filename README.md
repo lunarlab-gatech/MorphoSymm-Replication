@@ -49,7 +49,7 @@ python train_supervised.py --multirun dataset=contact dataset.data_folder=traini
 
 ### Use our models
 
-The models are too large to store on GitHub. Therefore, you can download the models from Georgia Tech's [Dropbox](https://www.dropbox.com/scl/fo/0vbkix9yl7mldo1orjzp9/AH9zQvmYtopHOTH54gIphMM?rlkey=t6lozelj0l8c5yxoe65t05n24&st=lxxnw48s&dl=0). Download the two folders at the link and put them into the `experiments/contact_sample_eff_splitted_mini-cheetah` directory.
+The models are too large to store on GitHub. Therefore, you can download the models from Georgia Tech's [Dropbox](https://www.dropbox.com/scl/fo/eforir6rwb1dtynszylf3/AP846M9XZlG672e22TLWquk?rlkey=c5m2y7lwg6onxgmxx82fp90yr&st=ehlsbzmp&dl=0). Download the two folders at the link and put them into the `experiments/contact_sample_eff_splitted_mini-cheetah` directory.
 
 ## Viewing Results
 
