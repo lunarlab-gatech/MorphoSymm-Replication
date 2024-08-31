@@ -7,7 +7,7 @@ This branch (*rss2023*) contains the results of running the Contact Estimation e
 - Validation set is given 149 missing entries (see Issue #3).
 - Fixed rounding error in 85/15 split for train and validation datasets (see Issue #4).
 
-These changes were made to ensure a fair comparison between this method ([On discrete symmetries of robotics systems: A group-theoretic and data-driven analysis](https://arxiv.org/abs/2302.10433)) and our own [MI-HGNN](https://github.com/lunarlab-gatech/MorphoSymm-Replication), as we couldn't compare if the dataset or metrics didn't match. To ensure that these
+These changes were made to ensure a fair comparison between this method ([On discrete symmetries of robotics systems: A group-theoretic and data-driven analysis](https://arxiv.org/abs/2302.10433)) and our own [MI-HGNN](https://github.com/lunarlab-gatech/Morphology-Informed-HGNN), as we couldn't compare if the dataset or metrics didn't match. To ensure that these
 changes preserved the functionality of the original method, we add a new directory `tests` which implement 7 test cases for
 the fixes.
 
