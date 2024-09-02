@@ -262,10 +262,7 @@ def generate_figure_4_right():
             df_legs_states = pandas.concat((df_legs_states, df_state))
 
     # Load the MIHGNN results and put them into the dataframe
-    mihgnn_results = pd.read_csv("experiments/contact_sample_eff_splitted_mini-cheetah/model=MIHGNN_train_ratio=0.85/mi-hgnn_8_model_results.csv", index_col=0)
-
-    # Remove irrelevant columns
-    mihgnn_drop = mihgnn_results.drop(["State", "Created", "Updated", "GPU Type", "Hostname", "Runtime", "seed"], axis=1)
+    mihgnn_drop = pd.read_csv("experiments/contact_sample_eff_splitted_mini-cheetah/model=MIHGNN_train_ratio=0.85/mi-hgnn_8_model_results.csv", index_col=0)
 
     # Note: For our metrics:
     # Leg 0 -> RL -> LH
