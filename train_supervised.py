@@ -85,14 +85,26 @@ def create_train_val_datasets(cfg, device):
     train_val_datasets = [air_walking_gait, grass, middle_pebble, concrete_left_circle, concrete_difficult_slippery, asphalt_road, old_asphalt_road, concrete_galloping,
                           rock_road, sidewalk]
 
+    # Set dataset percentages
+    train_percentage = cfg.dataset.train_ratio
+    val_percentage = 0.15
+
     train_subsets = []
     val_subsets = []
     for dataset in train_val_datasets:
-        split_index = int(np.round(dataset.__len__() * 0.85)) # When value has .5, round to nearest-even
-        train_subsets.append(torch.utils.data.Subset(dataset, np.arange(0, split_index)))
-        val_subsets.append(torch.utils.data.Subset(dataset, np.arange(split_index, dataset.__len__())))
+        train_index = int(np.round(dataset.__len__() * train_percentage)) # When value has .5, round to nearest-even
+        val_index = dataset.__len__() - int(np.round(dataset.__len__() * val_percentage))
+        train_subsets.append(torch.utils.data.Subset(dataset, np.arange(0, train_index)))
+        val_subsets.append(torch.utils.data.Subset(dataset, np.arange(val_index, dataset.__len__())))
     train_dataset = torch.utils.data.ConcatDataset(train_subsets)
-    val_dataset = torch.utils.data.ConcatDataset(val_subsets) 
+    val_dataset = torch.utils.data.ConcatDataset(val_subsets)
+
+    # Make sure that these datasets match the ones used in Morphology-Inspired HGNN
+    if train_percentage == 0.85:
+        np.testing.assert_equal(train_dataset.__len__(), 539363)
+        np.testing.assert_equal(val_dataset.__len__(), 95181)
+        print("=============== Dataset Verified to match Morphology-Inspired HGNN! ===============")
+
     return train_dataset, val_dataset
 
 def create_test_dataset(cfg, device):
