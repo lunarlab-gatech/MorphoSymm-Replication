@@ -90,8 +90,10 @@ class UmichContactDataset(contact_dataset):
             g_x_batch = torch.matmul(x_batch.unsqueeze(1), self.hin.unsqueeze(0).to(x_batch.dtype)).squeeze()
             g_y_batch = torch.matmul(y_batch.unsqueeze(1), self.hout.unsqueeze(0).to(x_batch.dtype)).squeeze()
 
-            # If the g_y_batch only has one entry, then we loose too many dimensions 
+            # If the batch only has one entry, then we lose too many dimensions 
             # with squeeze() and crash. Put one dimension back to avoid this.
+            if len(g_x_batch.shape) < 3:
+                g_x_batch = g_x_batch.unsqueeze(0)
             if len(g_y_batch.shape) < 2:
                 g_y_batch = g_y_batch.unsqueeze(0)
 
