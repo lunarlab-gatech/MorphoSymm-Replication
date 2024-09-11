@@ -89,6 +89,12 @@ class UmichContactDataset(contact_dataset):
             y_batch = F.one_hot(collated_batch['label'], num_classes=self.n_contact_states).to(x_batch.dtype)
             g_x_batch = torch.matmul(x_batch.unsqueeze(1), self.hin.unsqueeze(0).to(x_batch.dtype)).squeeze()
             g_y_batch = torch.matmul(y_batch.unsqueeze(1), self.hout.unsqueeze(0).to(x_batch.dtype)).squeeze()
+
+            # If the g_y_batch only has one entry, then we loose too many dimensions 
+            # with squeeze() and crash. Put one dimension back to avoid this.
+            if len(g_y_batch.shape) < 2:
+                g_y_batch = g_y_batch.unsqueeze(0)
+
             # Convert back to numerical class label.
             _, g_y = torch.max(g_y_batch, dim=1)
             # return {"data": g_x_batch, "label": g_y}
