@@ -1,11 +1,16 @@
 # MorphoSymm Contact Experiment Replication
 
-This branch (*rss2023*) contains the results of running the Contact Estimation experiment of the [MorphoSymm](https://github.com/Danfoa/MorphoSymm) repository with BUG FIXES. In addition to the necessary changes to setup the environment correctly and run the model, we also did the following:
+This branch (*rss2023sampleEfficiency*) contains the code for generating Fig.3 (b) in the "MI-HGNN" paper. 
+
+## Fork Details 
+This is a fork of the [MorphoSymm](https://github.com/Danfoa/MorphoSymm) repository with BUG FIXES. In addition to the necessary changes to setup the environment correctly and run the model, we also did the following:
 
 - Fix a bug in the calculation of the F1-Score.
 - Removed Invalid Dataset Entries (see Issue #2 and #3).
 - Validation set is given 149 missing entries (see Issue #3).
 - Fixed rounding error in 85/15 split for train and validation datasets (see Issue #4).
+- Fixed an issue where the validation sets weren't consistent when varying the train ratio.
+- Fixed a bug in "paper/contact_final_model_comparison.py" where the uncertainty was calculated incorrectly for the plot.
 
 These changes were made to ensure a fair comparison between this method ([On discrete symmetries of robotics systems: A group-theoretic and data-driven analysis](https://arxiv.org/abs/2302.10433)) and our own [MI-HGNN](https://github.com/lunarlab-gatech/Morphology-Informed-HGNN), as we couldn't compare if the dataset or metrics didn't match. To ensure that these
 changes preserved the functionality of the original method, we add a new directory `tests` which implement 7 test cases for
@@ -42,8 +47,8 @@ from ..utils.data_handler import *
 
 You can run the experiments yourself, or use our trained models:
 
-### Run experiments yourself
-You'll need to run the commands below 8 times in order to generate the 8 random runs with different seeds.
+### Run Sample Efficiency Experiments
+You'll need to run the commands below 8 times, each with a different train ratio:
 
 CNN & CNN-aug Experiments:
 ```
@@ -57,23 +62,19 @@ python train_supervised.py --multirun dataset=contact dataset.data_folder=traini
 
 ### Use our models
 
-The models are too large to store on GitHub. Therefore, you can download the models from Georgia Tech's [Dropbox](https://www.dropbox.com/scl/fo/8bz5ry3kkhn3tfy38tcwv/AIgvkXuT3HQ74hnVwMGXOs0?rlkey=1t7wswjkit4hl352mnzml9z3i&st=1medwgtz&dl=0). Download the three folders at the link and put them into the `experiments/contact_sample_eff_splitted_mini-cheetah` directory.
+The models are too large to store on GitHub. Therefore, you can download the Sample Efficiency models from Georgia Tech's [Dropbox](https://www.dropbox.com/scl/fo/uar2u4oc1e35g5cwndav3/ANiXOkexkqoCCNxu94yXM-s?rlkey=vtnazsbd6qut797lz9fvpb9d4&st=0czc0cip&dl=0). Download the folder at the link and put them into the `experiments/` directory.
 
-Note that the `model=MIHGNN_train_ratio=0.85` folder only contains a csv file with our metrics. That is because our metrics were logged to Weights & Biases and exported to csv format. If you'd like access to our MI-HGNN models used for this comparision and to evaulate the models yourself (to regenerate these metrics), see our [Morphology-Informed-HGNN](https://github.com/lunarlab-gatech/Morphology-Informed-HGNN) repository.
+Note that the `model=MI-HGNN_train_ratios_all` folder only contains a csv file with our metrics. That is because our metrics were logged to Weights & Biases and exported to csv format. If you'd like access to our MI-HGNN models used for this comparision and to evaluate the models yourself (to regenerate these metrics), see our [Morphology-Informed-HGNN](https://github.com/lunarlab-gatech/Morphology-Informed-HGNN) repository.
 
 ## Viewing Results
 
-The figure from the models can be found in the `experiments/contact_sample_eff_splitted_mini-cheetah/results_filter_['train_ratio=0.85']ignore_['scale=0.25', 'scale=0.5', 'scale=1.0', 'scale=1.5', 'scale=2.0', 'scale=2.5']` directory. Here is our Contact Experiment figure, which is similar to Figure 4-Right in the original paper:
+Figure 3 (b) from the "MI-HGNN" paper can be found here: `/home/dbutterfield3/Research/MorphoSymmEdits/MorphoSymm-Replication/experiments/contact_sample_eff_splitted_mini-cheetah/results_ignore_['scale=0.5', 'scale=1.0', 'scale=2.0']/contact_sample_eff_splitted_mini-cheetah_test_legs_avg-f1.png`.
 
-![Figure 4-Right Replicated](experiments/contact_sample_eff_splitted_mini-cheetah/results_filter_['train_ratio=0.85']ignore_['scale=0.25',%20'scale=0.5',%20'scale=1.0',%20'scale=1.5',%20'scale=2.0',%20'scale=2.5']/legs_contact_state_metrics.png)
+![Figure 3 (b) Replicated](experiments/contact_sample_eff_splitted_mini-cheetah/results_ignore_['scale=0.5', 'scale=1.0', 'scale=2.0']/contact_sample_eff_splitted_mini-cheetah_test_legs_avg-f1.png)
 
-However, if you want to generate the figure using your trained models, or regenerate the figure, use the commands below:
+However, if you want to generate the figure using your trained models, or simply regenerate the figure, use the commands below:
 
-Paper Figure 4-Left & Center:
-
-TODO
-
-Paper Figure 4-Right:
+:
 ```
-python paper/contact_final_model_comparison.py
+python paper/sample_efficiency_figures_contact_CNN-ECNN.py
 ```

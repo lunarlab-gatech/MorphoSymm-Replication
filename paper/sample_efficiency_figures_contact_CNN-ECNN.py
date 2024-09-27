@@ -3,14 +3,15 @@ import sys
 import os
 import pathlib
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import pandas
 import seaborn as sns
 import pandas as pd
 import numpy as np
 import re
-from datasets.umich_contact_dataset import UmichContactDataset
 
-from utils.utils import cm2inch
+def cm2inch(cm):
+    return cm / 2.54
 
 import re
 
@@ -121,9 +122,8 @@ def split_run_name(run_name):
 
 
 if __name__ == "__main__":
-    print(sys.argv, len(sys.argv))
 
-    experiments_path = 'experiments/contact_sample_eff_splitted_shuffled_mini-cheetah'
+    experiments_path = 'experiments/contact_sample_eff_splitted_mini-cheetah'
     # experiments_path = 'experiments/com_sample_eff_Solo-K4-C2'
     ignore_hps = [#['model=ECNN', 'augment=False'],
                   #['model=CNN', 'augment=True'],
@@ -263,6 +263,27 @@ if __name__ == "__main__":
     if 'ECNN' in model_types:
         model_types.reverse()
 
+    # Read in the MI-HGNN results
+    df_mihgnn = pd.read_csv("experiments/contact_sample_eff_splitted_mini-cheetah/model=MI-HGNN_train_ratios_all/mihgnn_sample_eff_full.csv")
+
+    # Get relevant values from our models
+    model_list, train_ratio_list, score_list, nums_list, hyper_params = [], [], [], [], []
+    i = 12
+    for index, row in df_mihgnn.iterrows():
+        nums_list.append(i)
+        i += 1
+        model_list.append("MI-HGNN")
+        train_ratio_list.append(row["train_percentage"])
+        score_list.append(float(row["test_F1_Score_Leg_Avg"]))
+        hyper_params.append("")
+
+    # Append it onto the MorphoSymm-Replication models
+    dict = {"test_legs_avg/f1": score_list, "Model Type": model_list, "train_ratio": train_ratio_list, 
+            "nums": nums_list, "Hyper params": hyper_params}
+    df_add = pd.DataFrame(dict, )
+    df_add = df_add.set_index("nums")
+    df = df.append(df_add)
+
     for metric_full_name in exp_metrics:
         ignore = False
         for metric_filter in metrics_filter:
@@ -270,10 +291,42 @@ if __name__ == "__main__":
                 ignore = True
         if ignore: continue
 
-        fig, ax = plt.subplots(figsize=(cm2inch(W), cm2inch(H)), dpi=210)
-        sns.lineplot(data=df, x='train_ratio', y=metric_full_name,
+        # We only care about test legs avg f1 score
+        if metric_full_name != "test_legs_avg/f1":
+            continue
+
+        # Calculate the training samples
+        def train_ratio_to_samples(row):
+            if row['train_ratio'] == 0.85:
+                return 539363
+            if row['train_ratio'] == 0.6375:
+                return 404521
+            if row['train_ratio'] == 0.425:
+                return 269680
+            if row['train_ratio'] == 0.2125:
+                return 134841
+            if row['train_ratio'] == 0.15:
+                return 95181
+            if row['train_ratio'] == 0.1:
+                return 63455
+            if row['train_ratio'] == 0.05:
+                return 31728
+            if row['train_ratio'] == 0.025:
+                return 15863
+        df['train_samples'] = df.apply(train_ratio_to_samples, axis=1)
+
+        # Add our model type to graph
+        model_types.insert(0, "MI-HGNN")
+
+        to_filter = ["test_loss", "test_contact_state/acc", "test_legs_avg/acc", "test_RF/acc", "test_LF/acc"]
+        for f in to_filter:
+            df = df.drop(f, axis=1)
+
+        print(df)
+        fig, ax = plt.subplots(figsize=(cm2inch(W) * 1.1 * 1.25, cm2inch(H) * 0.5 * 1.4), dpi=210)
+        sns.lineplot(data=df, x='train_samples', y=metric_full_name,
                      # hue='Hyper params', hue_order=model_hps,
-                     style='Hyper params', style_order=model_hps,
+                     #style='Hyper params', style_order=model_hps,
                      hue='Model Type', hue_order=model_types,
                      dashes=True,  #markers=markers[:len(model_types)],
                      ax=ax, ci=90,
@@ -281,17 +334,22 @@ if __name__ == "__main__":
                      )
 
         ax.grid(visible=True, alpha=0.2)
-        ax.set(yscale='log')
-        # ax.set(xscale='log')
+        # ax.set(yscale='log')
+        scale_x = 1000
+        ticks_x = ticker.FuncFormatter(lambda x, pos: '{val:0.3g}K'.format(val=x/scale_x))
+        ax.xaxis.set_major_formatter(ticks_x)
+        #ax.set(xscale='linear')
         # ax.ticklabel_format(style='plain', axis='y')
         pretty_metric_name = metric_full_name.replace("_", " ")
         title = f'{experiments_path.stem}'
-        fig_title = f'{experiments_path.stem}'.replace('sample_eff_', '').replace('contact_', '') \
-                .replace('splitted_', '') \
-                .replace('mini-cheetah', r'Mini-Cheetah $\mathcal{G}\approx\mathcal{C}_2$') + f" [{pretty_metric_name}]"
-        ax.set_title(fig_title)
+        # fig_title = f'{experiments_path.stem}'.replace('sample_eff_', '').replace('contact_', '') \
+        #         .replace('splitted_', '') \
+        #         .replace('mini-cheetah', r'Mini-Cheetah $\mathcal{G}\approx\mathcal{C}_2$') + f" [{pretty_metric_name}]"
+        # ax.set_title(fig_title)
         ax.spines.top.set_visible(False)
         ax.spines.right.set_visible(False)
+        ax.set_ylabel("Legs-Avg F1 Score")
+        ax.set_xlabel("Training Samples")
         # ax.legend(fancybox=True, framealpha=0.5)
         plt.legend(title=None, fontsize=7, fancybox=True, framealpha=0.3)
         plt.tight_layout()
