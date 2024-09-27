@@ -68,13 +68,11 @@ Note that the `model=MI-HGNN_train_ratios_all` folder only contains a csv file w
 
 ## Viewing Results
 
-Figure 3 (b) from the "MI-HGNN" paper can be found here: `/home/dbutterfield3/Research/MorphoSymmEdits/MorphoSymm-Replication/experiments/contact_sample_eff_splitted_mini-cheetah/results_ignore_['scale=0.5', 'scale=1.0', 'scale=2.0']/contact_sample_eff_splitted_mini-cheetah_test_legs_avg-f1.png`.
+Figure 3 (b) from the "MI-HGNN" paper can be found here: `experiments/contact_sample_eff_splitted_mini-cheetah/results_ignore_['scale=0.5', 'scale=1.0', 'scale=2.0']/contact_sample_eff_splitted_mini-cheetah_test_legs_avg-f1.png`.
 
-![Figure 3 (b) Replicated](experiments/contact_sample_eff_splitted_mini-cheetah/results_ignore_['scale=0.5', 'scale=1.0', 'scale=2.0']/contact_sample_eff_splitted_mini-cheetah_test_legs_avg-f1.png)
+![Figure 3 (b) Replicated](https://github.com/lunarlab-gatech/MorphoSymm-Replication/blob/rss2023sampleEfficiency/experiments/contact_sample_eff_splitted_mini-cheetah/results_ignore_%5B'scale%3D0.5'%2C%20'scale%3D1.0'%2C%20'scale%3D2.0'%5D/contact_sample_eff_splitted_mini-cheetah_test_legs_avg-f1.png)
 
 However, if you want to generate the figure using your trained models, or simply regenerate the figure, use the commands below:
-
-:
 ```
 python paper/sample_efficiency_figures_contact_CNN-ECNN.py
 ```
