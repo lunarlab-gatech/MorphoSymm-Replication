@@ -327,6 +327,14 @@ def generate_figure_4_right():
     for f in to_filter:
         df_legs_states = df_legs_states[df_legs_states["metric"] != f]
 
+    # Filter out State accuracies for state listed under one leg
+    to_filter = ["LF", "LH", "RF", "RH"]
+    for f in to_filter:
+        req_1 = df_legs_states["leg"] == f
+        req_2 = df_legs_states["metric"] == "State\nAcc"
+        req = ~(req_1 & req_2)
+        df_legs_states = df_legs_states[req]
+
     # Plot final results
     fig, ax = plt.subplots(figsize=(cm2inch(W) * 1.25, cm2inch(H)), dpi=210)
     b = np.unique(df_legs_states['metric'])
@@ -344,6 +352,15 @@ def generate_figure_4_right():
     ax.tick_params(axis='both', which='major', labelsize=9)
     plt.tight_layout()
     plt.savefig(out_path / f'legs_contact_state_metrics.png')
+    plt.show()
+
+    # Get State Accuracy of a specific model type - Change parameter to choose model type
+    model_to_calculate_state_acc = "ECNN"
+    to_filter = ["Leg-LF\nF1", "Leg-LH\nF1", "Leg-RF\nF1", "Leg-RH\nF1", "Legs-Avg\nF1"]
+    for f in to_filter:
+        df_legs_states = df_legs_states[df_legs_states["metric"] != f]
+    df_legs_states = df_legs_states[df_legs_states['Model Type'] == model_to_calculate_state_acc]
+    print(model_to_calculate_state_acc, " state accuracy: ", np.mean(df_legs_states["Metric Score"].tolist()))
 
     return df_legs_states
 

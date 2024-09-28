@@ -1,11 +1,15 @@
 # MorphoSymm Contact Experiment Replication
 
-This branch (*rss2023*) contains the results of running the Contact Estimation experiment of the [MorphoSymm](https://github.com/Danfoa/MorphoSymm) repository with BUG FIXES. In addition to the necessary changes to setup the environment correctly and run the model, we also did the following:
+This branch (*rss2023*) contains the code for generating Figure 3(a) in our "MI-HGNN" paper, as well as running the Contact Detection Experiment.
+
+## Fork Details
+This branch is a fork of the [MorphoSymm](https://github.com/Danfoa/MorphoSymm) repository with BUG FIXES. In addition to the necessary changes to setup the environment correctly and run the model, we also did the following:
 
 - Fix a bug in the calculation of the F1-Score.
 - Removed Invalid Dataset Entries (see Issue #2 and #3).
 - Validation set is given 149 missing entries (see Issue #3).
 - Fixed rounding error in 85/15 split for train and validation datasets (see Issue #4).
+- Fixed a bug in "paper/contact_final_model_comparison.py" where the uncertainty was calculated incorrectly for the plot.
 
 These changes were made to ensure a fair comparison between this method ([On discrete symmetries of robotics systems: A group-theoretic and data-driven analysis](https://arxiv.org/abs/2302.10433)) and our own [MI-HGNN](https://github.com/lunarlab-gatech/Morphology-Informed-HGNN), as we couldn't compare if the dataset or metrics didn't match. To ensure that these
 changes preserved the functionality of the original method, we add a new directory `tests` which implement 7 test cases for
@@ -63,17 +67,12 @@ Note that the `model=MIHGNN_train_ratio=0.85` folder only contains a csv file wi
 
 ## Viewing Results
 
-The figure from the models can be found in the `experiments/contact_sample_eff_splitted_mini-cheetah/results_filter_['train_ratio=0.85']ignore_['scale=0.25', 'scale=0.5', 'scale=1.0', 'scale=1.5', 'scale=2.0', 'scale=2.5']` directory. Here is our Contact Experiment figure, which is similar to Figure 4-Right in the original paper:
+Figure 3(a) from our "MI-HGNN" paper can be found in the `experiments/contact_sample_eff_splitted_mini-cheetah/results_filter_['train_ratio=0.85']ignore_['scale=0.25', 'scale=0.5', 'scale=1.0', 'scale=1.5', 'scale=2.0', 'scale=2.5']` directory.
 
-![Figure 4-Right Replicated](experiments/contact_sample_eff_splitted_mini-cheetah/results_filter_['train_ratio=0.85']ignore_['scale=0.25',%20'scale=0.5',%20'scale=1.0',%20'scale=1.5',%20'scale=2.0',%20'scale=2.5']/legs_contact_state_metrics.png)
+![Figure 3(a)](experiments/contact_sample_eff_splitted_mini-cheetah/results_filter_['train_ratio=0.85']ignore_['scale=0.25',%20'scale=0.5',%20'scale=1.0',%20'scale=1.5',%20'scale=2.0',%20'scale=2.5']/legs_contact_state_metrics.png)
 
-However, if you want to generate the figure using your trained models, or regenerate the figure, use the commands below:
+However, if you want to generate the figure using your trained models, or simply regenerate the figure, use the commands below:
 
-Paper Figure 4-Left & Center:
-
-TODO
-
-Paper Figure 4-Right:
 ```
 python paper/contact_final_model_comparison.py
 ```
