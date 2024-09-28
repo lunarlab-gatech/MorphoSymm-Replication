@@ -1,6 +1,6 @@
 # MorphoSymm Contact Experiment Replication
 
-This branch (*rss2023sampleEfficiency*) contains the code for generating Fig.3 (b) in the "MI-HGNN" paper, as well as running the Sample Efficency part of the Contact Detection experiment.
+This branch (*rss2023sampleEfficiency*) contains the code for generating Fig.3 (b) in the "MI-HGNN" paper, as well as running the Sample Efficiency part of the Contact Detection experiment.
 
 ## Fork Details 
 This is a fork of the [MorphoSymm](https://github.com/Danfoa/MorphoSymm) repository with BUG FIXES. In addition to the necessary changes to setup the environment correctly and run the model, we also did the following:
