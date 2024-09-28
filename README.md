@@ -9,7 +9,7 @@ This is a fork of the [MorphoSymm](https://github.com/Danfoa/MorphoSymm) reposit
 - Removed Invalid Dataset Entries (see Issue #2 and #3).
 - Validation set is given 149 missing entries (see Issue #3).
 - Fixed rounding error in 85/15 split for train and validation datasets (see Issue #4).
-- Fixed an issue where the validation sets weren't consistent when varying the train ratio.
+- Fixed an issue where the validation sets weren't consistent when varying the train ratio (see Issue #1).
 - Fixed a bug in "paper/contact_final_model_comparison.py" where the uncertainty was calculated incorrectly for the plot.
 
 These changes were made to ensure a fair comparison between this method ([On discrete symmetries of robotics systems: A group-theoretic and data-driven analysis](https://arxiv.org/abs/2302.10433)) and our own [MI-HGNN](https://github.com/lunarlab-gatech/Morphology-Informed-HGNN), as we couldn't compare if the dataset or metrics didn't match. To ensure that these
